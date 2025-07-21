@@ -2,17 +2,10 @@
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-const navLinks = [
-  { href: "/dashboard#new", label: "Nouvelle réservation", role: "responsable" },
-  { href: "/dashboard#mes-demandes", label: "Mes demandes de réservation", role: "responsable" },
-  { href: "/dashboard#a-traiter", label: "Demandes à traiter", role: "responsable" },
-  { href: "/admin", label: "Admin", role: "admin" },
-];
-
 export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<unknown>(null);
 
   useEffect(() => {
     if (pathname === "/login") return;

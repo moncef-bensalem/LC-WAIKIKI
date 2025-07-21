@@ -29,8 +29,12 @@ export default function AddMagasinForm({ onAdded }: Props) {
       setSuccess("Magasin ajouté !");
       onAdded();
       setTimeout(() => setSuccess(""), 2000);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Une erreur inconnue s'est produite.");
+      }
       setSuccess("");
     } finally {
       setLoading(false);

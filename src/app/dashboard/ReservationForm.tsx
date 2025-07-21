@@ -74,8 +74,12 @@ export default function ReservationForm({ onAdded }: Props) {
       setTelephone("");
       setMagasinSource("");
       onAdded();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Une erreur inconnue s'est produite.");
+      }
     } finally {
       setLoading(false);
     }
@@ -121,7 +125,7 @@ export default function ReservationForm({ onAdded }: Props) {
         className="border p-2 rounded text-black"
         required
       >
-        <option value="">Choisir magasin source (qui possède l'article)</option>
+        <option value="">Choisir magasin source (qui possède l&apos;article)</option>
         {magasins.map(m => (
           <option key={m._id} value={m._id}>{m.nom} ({m.code})</option>
         ))}

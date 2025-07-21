@@ -1,8 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongoose';
 import Magasin from '@/models/Magasin';
 
-export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
   await dbConnect();
   const { id } = params;
   const deleted = await Magasin.findByIdAndDelete(id);

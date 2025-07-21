@@ -27,8 +27,12 @@ export default function LoginPage() {
       } else {
         router.push("/dashboard");
       }
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Une erreur inconnue s'est produite.");
+      }
     } finally {
       setLoading(false);
     }
