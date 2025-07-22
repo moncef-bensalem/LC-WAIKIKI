@@ -11,7 +11,7 @@ const rl = readline.createInterface({
   output: process.stdout,
 });
 
-function ask(question) {
+function ask(question: string) {
   return new Promise(resolve => rl.question(question, resolve));
 }
 

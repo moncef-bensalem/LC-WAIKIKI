@@ -1,11 +1,11 @@
-import jwt from 'jsonwebtoken';
+import jwt, { Secret, SignOptions } from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
-const JWT_SECRET = process.env.JWT_SECRET as string;
+const JWT_SECRET: Secret = process.env.JWT_SECRET || '';
 if (!JWT_SECRET) throw new Error('JWT_SECRET not set');
 
 export function signJwt(payload: object, expiresIn = '7d') {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn });
+  return jwt.sign(payload, JWT_SECRET, { expiresIn } as SignOptions);
 }
 
 export function verifyJwt(token: string) {
@@ -22,4 +22,4 @@ export async function hashPassword(password: string) {
 
 export async function comparePassword(password: string, hash: string) {
   return bcrypt.compare(password, hash);
-} 
+}

@@ -10,7 +10,18 @@ export async function GET(req: NextRequest) {
   if (!auth) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
   const token = auth.replace('Bearer ', '');
   const payload = verifyJwt(token);
-  if (!payload || payload.role !== 'admin') return NextResponse.json({ error: 'Admin uniquement' }, { status: 403 });
+  if (
+    !payload ||
+    typeof payload !== "object" ||
+    payload === null ||
+    !("role" in payload)
+  ) {
+    return NextResponse.json({ error: "Admin uniquement" }, { status: 403 });
+  }
+  const jwtPayload = payload as { role: string };
+  if (jwtPayload.role !== "admin") {
+    return NextResponse.json({ error: "Admin uniquement" }, { status: 403 });
+  }
   const users = await User.find({ role: 'responsable' }).populate('magasinId');
   return NextResponse.json(users);
 }
@@ -21,7 +32,18 @@ export async function POST(req: NextRequest) {
   if (!auth) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
   const token = auth.replace('Bearer ', '');
   const payload = verifyJwt(token);
-  if (!payload || payload.role !== 'admin') return NextResponse.json({ error: 'Admin uniquement' }, { status: 403 });
+  if (
+    !payload ||
+    typeof payload !== "object" ||
+    payload === null ||
+    !("role" in payload)
+  ) {
+    return NextResponse.json({ error: "Admin uniquement" }, { status: 403 });
+  }
+  const jwtPayload = payload as { role: string };
+  if (jwtPayload.role !== "admin") {
+    return NextResponse.json({ error: "Admin uniquement" }, { status: 403 });
+  }
   const { email, password, magasinId } = await req.json();
   if (!email || !password || !magasinId) {
     return NextResponse.json({ error: 'Champs requis manquants.' }, { status: 400 });

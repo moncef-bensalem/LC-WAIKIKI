@@ -16,13 +16,22 @@ export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const type = url.searchParams.get('type');
 
-  if (payload.role === 'responsable') {
-    if (type === 'a_traiter') {
-      // Réservations à traiter dans mon magasin (magasin source = mon magasin)
-      filter = { magasinSource: new mongoose.Types.ObjectId(payload.magasinId) };
-    } else {
-      // Réservations créées par moi (magasin destination = mon magasin)
-      filter = { magasinDestination: new mongoose.Types.ObjectId(payload.magasinId), creePar: payload.id };
+  if (
+    typeof payload === "object" &&
+    payload !== null &&
+    "role" in payload &&
+    "magasinId" in payload &&
+    "id" in payload
+  ) {
+    const jwtPayload = payload as { role: string; magasinId: string; id: string };
+    if (jwtPayload.role === "responsable") {
+      if (type === "a_traiter") {
+        // Réservations à traiter dans mon magasin (magasin source = mon magasin)
+        filter = { magasinSource: new mongoose.Types.ObjectId(jwtPayload.magasinId) };
+      } else {
+        // Réservations créées par moi (magasin destination = mon magasin)
+        filter = { magasinDestination: new mongoose.Types.ObjectId(jwtPayload.magasinId), creePar: jwtPayload.id };
+      }
     }
   }
   // Admin : voit tout
@@ -41,6 +50,12 @@ export async function POST(req: NextRequest) {
   const payload = verifyJwt(token);
   if (!payload) return NextResponse.json({ error: 'Token invalide' }, { status: 401 });
 
+  // Vérification stricte du type de payload pour POST
+  let jwtPayload: { id: string } | null = null;
+  if (typeof payload === "object" && payload !== null && "id" in payload) {
+    jwtPayload = payload as { id: string };
+  }
+
   const { referenceArticle, nomClient, telephone, magasinSource, magasinDestination } = await req.json();
   if (!referenceArticle || !nomClient || !telephone || !magasinSource || !magasinDestination) {
     return NextResponse.json({ error: 'Champs requis manquants.' }, { status: 400 });
@@ -51,7 +66,7 @@ export async function POST(req: NextRequest) {
     telephone,
     magasinSource,
     magasinDestination,
-    creePar: payload.id,
+    creePar: jwtPayload ? jwtPayload.id : undefined,
     statut: 'en attente',
   });
   return NextResponse.json(reservation, { status: 201 });

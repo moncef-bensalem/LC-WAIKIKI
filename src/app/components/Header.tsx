@@ -29,21 +29,27 @@ export default function Header() {
       <div className="flex items-center gap-3">
         <span className="text-2xl font-extrabold text-white tracking-tight drop-shadow-lg select-none">LC Waikiki</span>
         <span className="ml-4 px-3 py-1 rounded-full bg-white/20 text-white text-xs font-semibold uppercase tracking-wider shadow-sm">
-          {user.role === 'admin' ? 'Admin' : 'Responsable'}
+          {typeof user === "object" && user !== null && "role" in user
+            ? user.role === "admin"
+              ? "Admin"
+              : "Responsable"
+            : ""}
         </span>
       </div>
       <div className="flex items-center gap-8">
-        {user.role === 'responsable' && (
+        {typeof user === "object" && user !== null && "role" in user && user.role === 'responsable' && (
           <>
             <a href="/dashboard#new" className="text-white font-medium hover:underline underline-offset-4 transition">Nouvelle réservation</a>
             <a href="/dashboard#mes-demandes" className="text-white font-medium hover:underline underline-offset-4 transition">Mes demandes</a>
             <a href="/dashboard#a-traiter" className="text-white font-medium hover:underline underline-offset-4 transition">À traiter</a>
           </>
         )}
-        {user.role === 'admin' && (
+        {typeof user === "object" && user !== null && "role" in user && user.role === 'admin' && (
           <a href="/admin" className="text-white font-medium hover:underline underline-offset-4 transition">Admin</a>
         )}
-        <span className="hidden sm:block text-white font-medium text-base drop-shadow-sm">{user.email}</span>
+        <span className="hidden sm:block text-white font-medium text-base drop-shadow-sm">
+          {typeof user === "object" && user !== null && "email" in user ? String(user.email) : ""}
+        </span>
         <button
           onClick={handleLogout}
           className="bg-white text-blue-700 font-bold px-4 py-1.5 rounded-full shadow hover:bg-blue-100 transition-all border border-blue-200"

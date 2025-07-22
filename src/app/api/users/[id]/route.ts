@@ -9,7 +9,18 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
   if (!auth) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
   const token = auth.replace('Bearer ', '');
   const payload = verifyJwt(token);
-  if (!payload || payload.role !== 'admin') return NextResponse.json({ error: 'Admin uniquement' }, { status: 403 });
+  if (
+    !payload ||
+    typeof payload !== "object" ||
+    payload === null ||
+    !("role" in payload)
+  ) {
+    return NextResponse.json({ error: "Admin uniquement" }, { status: 403 });
+  }
+  const jwtPayload = payload as { role: string };
+  if (jwtPayload.role !== "admin") {
+    return NextResponse.json({ error: "Admin uniquement" }, { status: 403 });
+  }
   try {
     const deleted = await User.findOneAndDelete({ _id: params.id, role: 'responsable' });
     if (!deleted) return NextResponse.json({ error: 'Utilisateur non trouvé.' }, { status: 404 });
@@ -28,10 +39,22 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   if (!auth) return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
   const token = auth.replace('Bearer ', '');
   const payload = verifyJwt(token);
-  if (!payload || payload.role !== 'admin') return NextResponse.json({ error: 'Admin uniquement' }, { status: 403 });
+  if (
+    !payload ||
+    typeof payload !== "object" ||
+    payload === null ||
+    !("role" in payload)
+  ) {
+    return NextResponse.json({ error: "Admin uniquement" }, { status: 403 });
+  }
+  const jwtPayload = payload as { role: string };
+  if (jwtPayload.role !== "admin") {
+    return NextResponse.json({ error: "Admin uniquement" }, { status: 403 });
+  }
   try {
     const { email, password, magasinId } = await req.json();
-    const update: unknown = {};
+    // Remplacer 'unknown' par un type explicite pour update
+    const update: Record<string, any> = {};
     if (email) update.email = email;
     if (password) update.password = await hashPassword(password);
     if (magasinId) update.magasinId = magasinId;
